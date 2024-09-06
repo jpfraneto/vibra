@@ -1,0 +1,32 @@
+{
+  "name": "vibra-app",
+  "version": "1.0.0",
+  "description": "Vibra - YouTube Player and Node Network",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.yourdomain.vibra",
+    "mac": {
+      "category": "public.app-category.video"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^13.0.0",
+    "electron-builder": "^22.11.7"
+  },
+  "dependencies": {
+    "ws": "^7.4.6"
+  }
+}

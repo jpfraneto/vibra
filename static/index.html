@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vibra</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .left-bar {
+            width: 10%;
+            background: linear-gradient(to bottom, red, orange, yellow, green, blue, indigo, violet, white);
+            animation: swirl 10s linear infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+        @keyframes swirl {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        .main-content {
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            height: 10vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .circles {
+            display: flex;
+        }
+        .circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .circle:hover {
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+        .login-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .login-btn:hover {
+            background-color: #45a049;
+        }
+        .content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        .paste-btn {
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .paste-btn:hover {
+            transform: scale(1.1);
+        }
+        .youtube-container {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        .left-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+        .left-circle:nth-child(-n+3) {
+            border: 4.44px solid red;
+        }
+        .left-circle:hover {
+            transform: scale(1.1);
+        }
+        .shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-bar">
+            <div class="left-circle" style="background-color: red;"></div>
+            <div class="left-circle" style="background-color: orange;"></div>
+            <div class="left-circle" style="background-color: yellow;"></div>
+            <div class="left-circle" style="background-color: green;"></div>
+            <div class="left-circle" style="background-color: blue;"></div>
+            <div class="left-circle" style="background-color: indigo;"></div>
+            <div class="left-circle" style="background-color: violet;"></div>
+            <div class="left-circle" style="background-color: white;"></div>
+        </div>
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="circles">
+                    <div class="circle" style="background-color: red;"></div>
+                    <div class="circle" style="background-color: orange;"></div>
+                    <div class="circle" style="background-color: yellow;"></div>
+                    <div class="circle" style="background-color: green;"></div>
+                    <div class="circle" style="background-color: blue;"></div>
+                    <div class="circle" style="background-color: indigo;"></div>
+                    <div class="circle" style="background-color: violet;"></div>
+                    <div class="circle" style="background-color: white;"></div>
+                </div>
+                <button class="login-btn">LOGIN</button>
+            </div>
+            <div class="content">
+                <div class="paste-btn">📋</div>
+                <div class="youtube-container"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let socket;
+
+        function connectWebSocket() {
+            socket = new WebSocket('ws://' + window.location.host + '/ws');
+
+            socket.onopen = function(e) {
+                console.log("WebSocket connection established");
+            };
+
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+
+            socket.onclose = function(event) {
+                console.log("WebSocket connection closed. Reconnecting...");
+                setTimeout(connectWebSocket, 1000);
+            };
+
+            socket.onerror = function(error) {
+                console.log(`WebSocket Error: ${error}`);
+            };
+        }
+
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'youtube':
+                    embedYoutubeVideo(data.videoId);
+                    break;
+                case 'ml_result':
+                    // Handle machine learning results
+                    console.log("ML Result:", data.result);
+                    break;
+                // Add more cases as needed
+            }
+        }
+
+        function embedYoutubeVideo(videoId) {
+            const container = document.querySelector('.youtube-container');
+            container.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            container.style.display = 'block';
+            document.querySelector('.paste-btn').style.display = 'none';
+        }
+
+        document.querySelector('.paste-btn').addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                const videoId = getYoutubeVideoId(text);
+                if (videoId) {
+                    socket.send(JSON.stringify({type: 'youtube', videoId: videoId}));
+                } else {
+                    shakeScreen();
+                    alert('Please paste a valid YouTube URL');
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard contents: ', err);
+            }
+        });
+
+        function getYoutubeVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function shakeScreen() {
+            document.body.classList.add('shake');
+            setTimeout(() => {
+                document.body.classList.remove('shake');
+            }, 500);
+        }
+
+        // Initialize WebSocket connection
+        connectWebSocket();
+    </script>
+</body>
+</html>

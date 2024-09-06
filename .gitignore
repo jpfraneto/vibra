@@ -1,0 +1,19 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore Electron binaries
+/vibra-electron/node_modules/electron/dist/electron
+
+# Ignore logs
+*.log
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE/project specific files
+.vscode/
+.idea/
+
+# Ignore environment files
+.env
