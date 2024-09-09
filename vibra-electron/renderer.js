@@ -1,5 +1,74 @@
 const { ipcRenderer } = require('electron');
 
+const channels = {
+    tech: [
+        "OwS9aTE2Go4", 
+    ],
+    nature: [
+        "29XymHesxa0", 
+    ],
+    music: [
+        "jslF_XNIilA", 
+    ],
+    gaming: [
+        "22oxQoEIUuk", 
+    ],
+    food: [
+        "zHP_4KG-LTI",
+    ],
+    space: [
+        "Y_plhk1FUQA", 
+    ],
+    art: [
+        "sfh2xoophiY", 
+    ],
+    sports: [
+        "J8voIyM81zY    ", 
+    ]
+};
+
+const streamers = {
+    "ThePrimeagen": "TEfoOlR9x6k",
+    "The Coding Train": "MazpwQNdJYQ",
+    "PirateSoftware": "GskGhpew_u4",
+    "0xCassie": "bMDv-0ZFwCA",
+};
+
+let currentChannel = 'tech';
+let currentVideoIndex = 0;
+
+// Event listeners for channel icons
+document.querySelectorAll('.channel-icon').forEach(icon => {
+    icon.addEventListener('click', (event) => {
+        currentChannel = event.target.dataset.channel;
+        currentVideoIndex = 0;
+        loadYoutubeVideo(channels[currentChannel][currentVideoIndex]);
+        updateActiveChannel(event.target);
+    });
+});
+
+// Event listeners for streamer icons
+document.querySelectorAll('.left-circle').forEach(circle => {
+    circle.addEventListener('click', (event) => {
+        const streamerName = event.target.title;
+        const videoId = streamers[streamerName];
+        if (videoId) {
+            loadYoutubeVideo(videoId);
+            currentChannel = null; // Reset channel selection when a streamer is clicked
+            updateActiveChannel(null);
+        }
+    });
+});
+
+function updateActiveChannel(clickedIcon) {
+    document.querySelectorAll('.channel-icon').forEach(icon => {
+        icon.classList.remove('active');
+    });
+    if (clickedIcon) {
+        clickedIcon.classList.add('active');
+    }
+}
+
 document.querySelector('.paste-btn').addEventListener('click', async () => {
     try {
         const text = await navigator.clipboard.readText();
@@ -43,3 +112,16 @@ ipcRenderer.on('ws-message', (event, data) => {
         loadYoutubeVideo(message.content);
     }
 });
+
+// Add event listener for spacebar to cycle through videos
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'Space' && currentChannel) {
+        event.preventDefault(); // Prevent default spacebar behavior
+        currentVideoIndex = (currentVideoIndex + 1) % channels[currentChannel].length;
+        loadYoutubeVideo(channels[currentChannel][currentVideoIndex]);
+    }
+});
+
+// Initial load
+document.querySelector('.channel-icon[data-channel="tech"]').classList.add('active');
+loadYoutubeVideo(channels.tech[0]);
